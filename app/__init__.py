@@ -1,11 +1,11 @@
 from flask import Flask
 
-from mysql_pool import MySQLPool
+from mysql_pool import mysql_pool
+from .views import *
 
 app = Flask(__name__)
-app.config["conn"] = MySQLPool()
 
-with app.config.get("conn") as conn:
+with mysql_pool as conn:
     c = conn.cursor()
     c.execute("SHOW TABLES")
     result = c.fetchall()
@@ -43,6 +43,8 @@ with app.config.get("conn") as conn:
     if not ("tblbooking",) in tables:
         with open("./sql/08_tblbooking.sql", "r") as f:
             c.execute(f.read())
+
+app.register_blueprint(accounts_bp, url_prefix="/accounts")
 
 if __name__ == "__main__":
     app.run()

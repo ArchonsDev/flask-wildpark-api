@@ -21,3 +21,5 @@ class MySQLPool:
         self.conn.commit()
         self.conn.close()
         self.conn = None
+
+mysql_pool = MySQLPool()
