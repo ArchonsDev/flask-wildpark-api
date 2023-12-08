@@ -1,18 +1,19 @@
-from mysql.connector.pooling import MySQLConnectionPool, PooledMySQLConnection
+import mysql.connector.pooling
+import json
+import os
 
 class MySQLPool:
-    def __init__(self, host, user, password, database, port=3306) -> None:
-        self.connection_pool = MySQLConnectionPool(
+    def __init__(self) -> None:
+        with open("db_settings.json", "r") as f:
+            DB_CONFIG = json.load(f)
+
+        self.connection_pool = mysql.connector.pooling.MySQLConnectionPool(
             pool_name="myPool",
             pool_size=16,
-            host=host,
-            user=user,
-            password=password,
-            database=database,
-            port=port
+            **DB_CONFIG
         )
 
-    def __enter__(self) -> PooledMySQLConnection:
+    def __enter__(self) -> mysql.connector.pooling.PooledMySQLConnection:
         self.conn = self.connection_pool.get_connection()
         return self.conn
     
