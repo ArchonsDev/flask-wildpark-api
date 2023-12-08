@@ -1,7 +1,7 @@
 {
     "host": "127.0.0.1",
-    "user": "",
-    "password": "",
-    "database": "",
+    "user": "flaskuser",
+    "password": "Wildparkbestm00sic!",
+    "database": "dbwildpark_im2",
     "port": 3306
 }
