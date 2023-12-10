@@ -74,3 +74,5 @@ ipython_config.py
 # pipenv
 Pipfile.lock
 Pipfile
+
+.venv/
