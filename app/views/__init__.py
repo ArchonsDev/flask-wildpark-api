@@ -1,0 +1,1 @@
+from .accounts_bp import accounts_bp
