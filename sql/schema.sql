@@ -77,3 +77,55 @@ FROM
     JOIN tblaccount a ON b.booker_id = a.id
     JOIN tblvehicle v ON b.vehicle_id = v.id
     JOIN tblparkingarea pa ON b.parking_area_id = pa.id;
+
+--BOOKINGS PROCEDURES
+DELIMITER $$$
+CREATE PROCEDURE sp_CreateBooking(
+    IN p_date DATETIME,
+    IN p_parking_area_id INT,
+    IN p_vehicle_id INT,
+    IN p_booker_id INT, 
+)
+BEGIN
+    --Checks if the booker owns the vehicle
+    DECLARE isVehicleOwner INT DEFAULT 0;
+    SELECT COUNT(*) INTO isVehicleOwner FROM vw_VehiclesWithOwners 
+    WHERE vehicle_id = p_vehicle_id AND owner_id = p_booker_id;
+
+    IF isVehicleOwner > 0 THEN
+        INSERT INTO tblbooking (date, parking_area_id, vehicle_id, booker_id, status) 
+        VALUES (p_date, p_parking_area_id, p_vehicle_id, p_booker_id, 'Pending');
+    ELSE 
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = "Operation failed.";
+    END IF;
+END$$$
+DELIMITER ;
+
+DELIMITER $$$
+CREATE PROCEDURE sp_UpdateBooking(
+    IN p_booking_id INT,
+    IN p_booker_id INT,
+    IN p_date DATETIME NULL,
+    IN p_parking_area_id INT NULL,
+    IN p_vehicle_id INT NULL
+)
+BEGIN
+    --Checks if the booker owns the vehicle
+    DECLARE isVehicleOwner INT DEFAULT 0;
+    SELECT COUNT(*) INTO isVehicleOwner FROM vw_VehiclesWithOwners 
+    WHERE vehicle_id = p_vehicle_id AND owner_id = p_booker_id;
+
+    IF isVehicleOwner > 0 THEN
+        UPDATE tblbooking
+        SET
+            date = COALESCE(p_date, date),
+            parking_area_id = COALESCE(p_parking_area_id, parking_area_id),
+            vehicle_id = COALESCE(p_vehicle_id, vehicle_id)
+        WHERE booking_id = p_booking_id AND booker_id = p_booker_id;
+    ELSE 
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = "Operation failed.";
+    END IF;
+END $$$
+DELIMITER ;
