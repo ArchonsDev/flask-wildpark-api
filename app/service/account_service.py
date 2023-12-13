@@ -1,11 +1,11 @@
 from mysql_pool import mysql_pool
 
 class AccountService:
-    def create_account(firstname, lastname, email, password):
+    def create_account(firstname, lastname):
         with mysql_pool as conn:
-            query = "INSERT INTO tblaccount (firstname, lastname, email, password) VALUES (%s, %s, %s, %s)"
+            query = "INSERT INTO tblaccount (firstname, lastname) VALUES (%s, %s)"
             c = conn.cursor()
-            c.execute(query, (firstname, lastname, email, password,))
+            c.execute(query, (firstname, lastname))
 
     def get_all_accounts():
         with mysql_pool as conn:
