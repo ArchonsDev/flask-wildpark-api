@@ -16,10 +16,8 @@ def index():
         data = request.json
         firstname = data.get("firstname")
         lastname = data.get("lastname")
-        email = data.get("email")
-        password = data.get("password")
 
-        acc_service.create_account(firstname, lastname, email, password)
+        acc_service.create_account(firstname, lastname)
         return "User created!"
     else:
         return 'Unsupported method', 405

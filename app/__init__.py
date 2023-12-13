@@ -1,9 +1,12 @@
 from flask import Flask
+from app.views import parkingarea_bp, vehicle_bp
 
 from mysql_pool import mysql_pool
 from .views import *
 
 app = Flask(__name__)
+
+
 
 with mysql_pool as conn:
     c = conn.cursor()
@@ -29,6 +32,8 @@ with mysql_pool as conn:
             c.execute(f.read())
 
 app.register_blueprint(accounts_bp, url_prefix="/accounts")
+app.register_blueprint(vehicle_bp, url_prefix='/vehicle')
+app.register_blueprint(parkingarea_bp, url_prefix='/parkingarea')
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)

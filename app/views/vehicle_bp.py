@@ -14,7 +14,7 @@ def index():
         return veh_service.get_all_vehicles()
     elif request.method == 'POST':
         data = request.json
-        required_fields = ["vehicle_type", "color", "make", "model", "plate_number", "type", "displacement", "owner_id", "parking_area_id"]
+        required_fields = ["color", "make", "model", "plate_number", "owner_id", "parking_area_id"]
         
         if not all(field in data for field in required_fields):
             return jsonify({"message": "Missing required fields"}), 400
@@ -28,10 +28,10 @@ def index():
     else:
         return 'Unsupported method', 405
     
-@vehicle_bp.route("/<owner_id>", methods=["GET", "PUT", "DELETE"])
-def vehicle(owner_id):
+@vehicle_bp.route("/<vehicle_id>", methods=["GET", "PUT", "DELETE"])
+def vehicle(vehicle_id):
     if request.method == "GET":
-        vehicle_details = veh_service.get_vehicle_by_owner_id(owner_id)
+        vehicle_details = veh_service.get_vehicle_by_vehicle_id(vehicle_id)
         
         if vehicle_details:
             return jsonify(vehicle_details), 200
@@ -39,30 +39,14 @@ def vehicle(owner_id):
             return jsonify({"message": "Vehicle not found"}), 404
     elif request.method == "PUT":
         data = request.json
-        updated_fields = {
-            "vehicle_type": data.get("vehicle_type"),
-            "color": data.get("color"),
-            "make": data.get("make"),
-            "model": data.get("model"),
-            "plate_number": data.get("plate_number"),
-            "type": data.get("type"),
-            "displacement": data.get("displacement"),
-            "owner_id": data.get("owner_id"),
-            "parking_area_id": data.get("parking_area_id"),
-        }
-
-        success = veh_service.update_vehicle(owner_id, **updated_fields)
-
-        if success:
-            return jsonify({"message": f"Vehicle with ID {owner_id} updated successfully"}), 200
-        else:
-            return jsonify({"message": f"Failed to update vehicle with ID {owner_id}"}), 500
+        veh_service.update_vehicle(vehicle_id, data)
+        return jsonify({"message": f"Vehicle with ID {vehicle_id} updated successfully"}), 200
     elif request.method == "DELETE":
-        success = veh_service.delete_vehicle(owner_id)
+        success = veh_service.delete_vehicle(vehicle_id)
 
         if success:
-            return jsonify({"message": f"Vehicle with ID {owner_id} deleted successfully"}), 200
+            return jsonify({"message": f"Vehicle with ID {vehicle_id} deleted successfully"}), 200
         else:
-            return jsonify({"message": f"Failed to delete vehicle with ID {owner_id}"}), 500
+            return jsonify({"message": f"Failed to delete vehicle with ID {vehicle_id}"}), 500
     else:
         return "Unsupported method", 405

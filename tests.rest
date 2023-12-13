@@ -1,0 +1,44 @@
+@host = http://127.0.0.1:5000/
+
+###Create Account
+POST {{host}}/accounts
+Content-Type: application/json
+
+{
+    "firstname" : "Ced",
+    "lastname" : "Drick"
+}
+
+
+###Add a vehicle
+POST {{host}}/vehicle
+Content-Type: application/json
+
+{
+    "color": "blue",
+    "make": "honda",
+    "model": "honda beat",
+    "plate_number": "123 ABC",
+    "owner_id": 1,
+    "parking_area_id": null
+}
+
+###Gets All vehicles
+GET {{host}}/vehicle
+Content-Type: application/json
+
+###Update a vehicle
+PUT {{host}}/vehicle/3
+Content-Type: application/json
+
+{
+    "owner_id" : 1,
+    "color": "cyan",
+    "make": "honda",
+    "model": "honda beat",
+    "plate_number": "123 CED"
+}
+
+###Remove a vehicle
+DELETE {{host}}/vehicle/1
+Content-Type: application/json
