@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify
-
 from ..service import VehicleService as veh_service
 
 vehicle_bp = Blueprint('vehicle', __name__)

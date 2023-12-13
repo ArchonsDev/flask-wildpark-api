@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify
-
 from ..service import ParkingareaService as park_service
 
 parkingarea_bp = Blueprint('parkingarea', __name__)

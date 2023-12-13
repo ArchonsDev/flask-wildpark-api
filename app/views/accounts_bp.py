@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify
-
 from ..service import AccountService as acc_service
 
 accounts_bp = Blueprint('accounts', __name__)

@@ -1,12 +1,9 @@
 from flask import Flask
-from app.views import parkingarea_bp, vehicle_bp
 
 from mysql_pool import mysql_pool
 from .views import *
 
 app = Flask(__name__)
-
-
 
 with mysql_pool as conn:
     c = conn.cursor()
