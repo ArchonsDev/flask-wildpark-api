@@ -1,0 +1,46 @@
+@host = http://127.0.0.1:5000/
+
+### Create booking
+POST {{host}}/bookings
+Content-Type: application/json
+
+{
+    "date" : "2023-12-19 8:00",
+    "parking_area_id" : 1,
+    "vehicle_id" : 1,
+    "booker_id" : 1
+}
+
+### Create another sample booking
+POST {{host}}/bookings
+Content-Type: application/json
+
+{
+    "date" : "2023-12-13 9:00",
+    "parking_area_id" : 1,
+    "vehicle_id" : 2,
+    "booker_id" : 2
+}
+
+### Get bookings
+GET {{host}}/bookings
+Content-Type: application/json
+
+### Get booking by ID
+GET {{host}}/bookings/1
+Content-Type: application/json
+
+### Update booking
+PUT {{host}}/bookings/1
+Content-Type: application/json
+
+{
+    "booker_id" : 1,
+    "status" : "Paid"
+}
+
+### Delete booking
+DELETE {{host}}/bookings/5
+Content-Type: application/json
+
+

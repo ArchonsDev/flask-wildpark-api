@@ -1,4 +1,5 @@
 from flask import Flask
+from app.views import bookings_bp
 
 from mysql_pool import mysql_pool
 from .views import *
@@ -29,6 +30,8 @@ with mysql_pool as conn:
             c.execute(f.read())
 
 app.register_blueprint(accounts_bp, url_prefix="/accounts")
+app.register_blueprint(bookings_bp, url_prefix="/bookings")
+
 
 if __name__ == "__main__":
     app.run()
