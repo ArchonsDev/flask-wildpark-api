@@ -20,20 +20,22 @@ class BookingService:
         with mysql_pool as conn:
             query = "SELECT * FROM tblbooking WHERE id=%s"
             c = conn.cursor()
-            c.execute(query, (id))
+            c.execute(query, (id,))
 
             return c.fetchone()
+        
     # Update
     def update_booking(booking_id, data):
         booker_id = data.get('booker_id')
         date = data.get('date', None) 
         parking_area_id = data.get('parking_area_id', None)
         vehicle_id = data.get('vehicle_id', None)
+        status = data.get('status', None)
         
         with mysql_pool as conn:
-            query = "CALL sp_UpdateBooking(%s, %s, %s, %s, %s)"
+            query = "CALL sp_UpdateBooking(%s, %s, %s, %s, %s, %s)"
             c = conn.cursor()
-            c.execute(query, (booking_id, booker_id, date, parking_area_id, vehicle_id))
+            c.execute(query, (booking_id, booker_id, date, parking_area_id, vehicle_id, status))
     
     # No idea how to do this LOL thought might be aight to use 
     def pay_booking(booking_id, booker_id):
@@ -47,6 +49,6 @@ class BookingService:
         with mysql_pool as conn:
             query = "DELETE FROM tblbooking WHERE id=%s"
             c = conn.cursor()
-            c.execute(query, (id))
+            c.execute(query, (id,))
 
-            return True
+            return c.rowcount > 0

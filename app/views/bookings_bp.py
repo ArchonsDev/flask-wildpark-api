@@ -3,9 +3,9 @@ from ..service import BookingService as booking_service
 
 bookings_bp = Blueprint('bookings', __name__)
 
-@bookings_bp.route('/')
+@bookings_bp.route('/ping')
 def hello():
-    return "Hello World!"
+    return "pong!"
 
 @bookings_bp.route("/", methods=["GET", "POST"])
 def index():
@@ -26,12 +26,18 @@ def index():
 @bookings_bp.route("/<id>", methods=["GET", "PUT", "DELETE"])
 def booking(id):
     if request.method == "GET":
-        return booking_service.get_booking_by_id(id)
+        booking = booking_service.get_booking_by_id(id)
+        if booking:
+            return jsonify(booking), 200
+        return jsonify({"error": "Booking not found"}), 404
     elif request.method == "PUT":
         data = request.json
         booking_service.update_booking(id, data)
         return jsonify({"message" : "Booking updated successfully"}), 200
     elif request.method == "DELETE":
-        return booking_service.delete_booking(id)
+        is_deleted = booking_service.delete_booking(id)
+        if is_deleted:
+            return jsonify({"message" : "Booking deleted successfully"}), 200
+        return jsonify({"error" : "Booking could not be found or deleted"}), 404
     else:
         return "Unsupported method", 405

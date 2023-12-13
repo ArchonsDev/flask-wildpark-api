@@ -78,16 +78,15 @@ FROM
     JOIN tblvehicle v ON b.vehicle_id = v.id
     JOIN tblparkingarea pa ON b.parking_area_id = pa.id;
 
---BOOKINGS PROCEDURES
+-- BOOKINGS PROCEDURES
 DELIMITER $$$
 CREATE PROCEDURE sp_CreateBooking(
     IN p_date DATETIME,
     IN p_parking_area_id INT,
     IN p_vehicle_id INT,
-    IN p_booker_id INT, 
+    IN p_booker_id INT
 )
 BEGIN
-    --Checks if the booker owns the vehicle
     DECLARE isVehicleOwner INT DEFAULT 0;
     SELECT COUNT(*) INTO isVehicleOwner FROM vw_VehiclesWithOwners 
     WHERE vehicle_id = p_vehicle_id AND owner_id = p_booker_id;
@@ -106,26 +105,38 @@ DELIMITER $$$
 CREATE PROCEDURE sp_UpdateBooking(
     IN p_booking_id INT,
     IN p_booker_id INT,
-    IN p_date DATETIME NULL,
-    IN p_parking_area_id INT NULL,
-    IN p_vehicle_id INT NULL
+    IN p_date DATETIME,
+    IN p_parking_area_id INT,
+    IN p_vehicle_id INT,
+    IN p_status VARCHAR(255)
 )
 BEGIN
-    --Checks if the booker owns the vehicle
     DECLARE isVehicleOwner INT DEFAULT 0;
-    SELECT COUNT(*) INTO isVehicleOwner FROM vw_VehiclesWithOwners 
-    WHERE vehicle_id = p_vehicle_id AND owner_id = p_booker_id;
 
-    IF isVehicleOwner > 0 THEN
+    IF p_vehicle_id IS NOT NULL THEN
+        SELECT COUNT(*) INTO isVehicleOwner FROM vw_VehiclesWithOwners 
+        WHERE vehicle_id = p_vehicle_id AND owner_id = p_booker_id;
+
+        IF isVehicleOwner = 0 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = "Operation failed: Booker does not own the vehicle.";
+        ELSE
+            UPDATE tblbooking
+            SET
+                date = COALESCE(p_date, date),
+                parking_area_id = COALESCE(p_parking_area_id, parking_area_id),
+                vehicle_id = COALESCE(p_vehicle_id, vehicle_id),
+                status = COALESCE(p_status, status)
+            WHERE id = p_booking_id AND booker_id = p_booker_id;
+        END IF;
+    ELSE
+        -- Perform the update operation when p_vehicle_id is NULL
         UPDATE tblbooking
         SET
             date = COALESCE(p_date, date),
             parking_area_id = COALESCE(p_parking_area_id, parking_area_id),
-            vehicle_id = COALESCE(p_vehicle_id, vehicle_id)
-        WHERE booking_id = p_booking_id AND booker_id = p_booker_id;
-    ELSE 
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = "Operation failed.";
+            status = COALESCE(p_status, status)
+        WHERE id = p_booking_id AND booker_id = p_booker_id;
     END IF;
 END $$$
 DELIMITER ;
