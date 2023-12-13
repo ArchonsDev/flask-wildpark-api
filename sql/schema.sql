@@ -1,10 +1,28 @@
 DELIMITER //
 CREATE PROCEDURE sp_InsertAccount(
     IN p_firstname VARCHAR(255),
-    IN p_lastname VARCHAR(255)
+    IN p_lastname VARCHAR(255),
+    OUT p_inserted_id INT
 )
 BEGIN
     INSERT INTO tblaccount (firstname, lastname) VALUES (p_firstname, p_lastname);
+    
+    -- Retrieve the last inserted ID and store it in the OUT parameter
+    SET p_inserted_id = LAST_INSERT_ID();
+END //
+
+CREATE PROCEDURE sp_UpdateAccount(
+    IN p_account_id INT,
+    IN p_firstname VARCHAR(255),
+    IN p_lastname VARCHAR(255),
+    OUT p_new_firstname VARCHAR(255),
+    OUT p_new_lastname VARCHAR(255)
+)
+BEGIN
+    UPDATE tblaccount SET firstname = p_firstname, lastname = p_lastname WHERE id = p_account_id;
+    
+    SELECT firstname INTO p_new_firstname FROM tblaccount WHERE id = p_account_id;
+    SELECT lastname INTO p_new_lastname FROM tblaccount WHERE id = p_account_id;
 END //
 
 CREATE PROCEDURE sp_DeleteAccount(

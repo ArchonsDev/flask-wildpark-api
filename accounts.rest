@@ -1,0 +1,32 @@
+@host = http://127.0.0.1:5000/
+
+### Create account
+POST {{host}}/accounts
+Content-Type: application/json
+
+{
+    "firstname": "John",
+    "lastname": "Doe"
+}
+
+### Get all accounts
+GET {{host}}/accounts
+
+### Account ID
+@id = 1
+
+### Get account by id
+GET {{host}}/accounts/{{id}}
+
+### Update account
+PUT {{host}}/accounts/{{id}}
+Content-Type: application/json
+
+{
+    "id": 1,
+    "firstname": "New Jane",
+    "lastname": "New Doe"
+}
+
+### Delete account
+DELETE {{host}}/accounts/{{id}}
