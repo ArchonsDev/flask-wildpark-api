@@ -16,28 +16,12 @@ with mysql_pool as conn:
         with open("./sql/01_tblaccount.sql", "r") as f:
             c.execute(f.read())
 
-    if not ("tblorganization",) in tables:
-        with open("./sql/02_tblorganization.sql", "r") as f:
-            c.execute(f.read())
-
-    if not ("tblorganizationadmin",) in tables:
-        with open("./sql/03_tblorganizationadmin.sql", "r") as f:
-            c.execute(f.read())
-
-    if not ("tblorganizationmember",) in tables:
-        with open("./sql/04_tblorganizationmember.sql", "r") as f:
-            c.execute(f.read())
-
     if not ("tblparkingarea",) in tables:
         with open("./sql/05_tblparkingarea.sql") as f:
             c.execute(f.read())
 
     if not ("tblvehicle",) in tables:
         with open("./sql/06_tblvehicle.sql", "r") as f:
-            c.execute(f.read())
-
-    if not ("tblpayment",) in tables:
-        with open("./sql/07_tblpayment.sql", "r") as f:
             c.execute(f.read())
 
     if not ("tblbooking",) in tables:
