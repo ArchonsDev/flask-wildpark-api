@@ -21,6 +21,7 @@ class ParkingareaService:
             query = "UPDATE tblparkingarea SET slots = %s WHERE id = %s"
             c = conn.cursor()
             c.execute(query, (slots, parking_area_id))
+            return True
         
     def delete_parkingarea(parking_area_id):
         with mysql_pool as conn:
