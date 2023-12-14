@@ -42,3 +42,28 @@ Content-Type: application/json
 ###Remove a vehicle
 DELETE {{host}}/vehicle/1
 Content-Type: application/json
+
+###Add parking area
+POST {{host}}/parkingarea
+Content-Type: application/json
+
+{
+    "slots": 40
+}
+
+###Get all parking area
+GET {{host}}/parkingarea
+Content-Type: application/json
+
+
+###Update Parking area
+PUT {{host}}/parkingarea/3
+Content-Type: application/json
+
+{
+    "slots" : 10
+}
+
+###Delete a Parking area
+DELETE {{host}}/parkingarea/2
+Content-Type: application/json
