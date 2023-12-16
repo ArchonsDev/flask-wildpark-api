@@ -187,3 +187,39 @@ BEGIN
     END IF;
 END $$$
 DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE sp_UpdateParkingarea(
+    IN p_parking_area_id INT,
+    IN p_slots INT
+)
+BEGIN
+    UPDATE tblparkingarea
+    SET slots = p_slots
+    WHERE id = p_parking_area_id;
+END //
+DELIMITER ;
+
+CREATE PROCEDURE sp_GetAllParkingAreas()
+BEGIN
+    SELECT * FROM tblparkingarea;
+END //
+DELIMITER ;
+
+CREATE PROCEDURE sp_InsertParkingArea(
+    IN p_slots INT
+)
+BEGIN
+    INSERT INTO tblparkingarea (slots)
+    VALUES (p_slots);
+END //
+DELIMITER ;
+
+CREATE PROCEDURE sp_DeleteParkingArea(
+    IN p_parking_area_id INT
+)
+BEGIN
+    DELETE FROM tblparkingarea
+    WHERE id = p_parking_area_id;
+END //
+DELIMITER ;
