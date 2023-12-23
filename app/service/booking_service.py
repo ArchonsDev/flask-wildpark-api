@@ -3,46 +3,50 @@ from mysql_pool import mysql_pool
 class BookingService:
     # Create
     def create_booking(date, parking_area_id, vehicle_id, booker_id):
-        with mysql_pool as conn:
-            query = "CALL sp_CreateBooking(%s, %s, %s, %s)"
-            c = conn.cursor()
-            c.execute(query, (date, parking_area_id, vehicle_id, booker_id))
+        try:
+            with mysql_pool as conn:
+                query = "CALL sp_CreateBooking(%s, %s, %s, %s)"
+                c = conn.cursor()
+                c.execute(query, (date, parking_area_id, vehicle_id, booker_id))
+                conn.commit()
+                return {"message": "Booking create successfully"}, 200
+        except Exception as e:
+            return {"error": e.msg}, 400
+    
     # Read
     def get_all_bookings():
         with mysql_pool as conn:
             query = "SELECT * from vw_BookingDetails"
             c = conn.cursor()
             c.execute(query)
+            rows = c.fetchall()
 
-            return c.fetchall()
+            columns = ['id', 'date', 'status', 'booker_id',  'firstname', 'lastname', 'vehicle_id', 'plate_number', 'parking_area_id']
+            bookings = [dict(zip(columns, row)) for row in rows]
+
+            return bookings
         
     def get_booking_by_id(id):
         with mysql_pool as conn:
             query = "SELECT * FROM tblbooking WHERE id=%s"
             c = conn.cursor()
             c.execute(query, (id,))
+            row = c.fetchone()
+            
+            if row:
+                columns = ['booking_id', 'date', 'parking_area_id', 'vehicle_id', 'booker_id', 'status']
+                booking = dict(zip(columns, row))
 
-            return c.fetchone()
+                return booking
+
+            return None
         
     # Update
-    def update_booking(booking_id, data):
-        booker_id = data.get('booker_id')
-        date = data.get('date', None) 
-        parking_area_id = data.get('parking_area_id', None)
-        vehicle_id = data.get('vehicle_id', None)
-        status = data.get('status', None)
-        
+    def update_booking(booking_id):
         with mysql_pool as conn:
-            query = "CALL sp_UpdateBooking(%s, %s, %s, %s, %s, %s)"
+            query = "UPDATE tblbooking set STATUS = 'Paid' where id = %s"
             c = conn.cursor()
-            c.execute(query, (booking_id, booker_id, date, parking_area_id, vehicle_id, status))
-    
-    # No idea how to do this LOL thought might be aight to use 
-    def pay_booking(booking_id, booker_id):
-        with mysql_pool as conn:
-            query = "UPDATE tblbooking SET status = 'Paid' where booking_id = %s AND booker_id = %s"
-            c = conn.cursor()
-            c.execute(query, (booking_id, booker_id))
+            c.execute(query, (booking_id,))
 
     # Delete
     def delete_booking(id):

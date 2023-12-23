@@ -11,6 +11,7 @@ def hello():
 def index():
     if request.method == 'GET':
         return booking_service.get_all_bookings()
+    
     elif request.method == 'POST':
         data = request.json
         date = data.get("date")
@@ -18,8 +19,9 @@ def index():
         vehicle_id = data.get("vehicle_id")
         booker_id = data.get("booker_id")
 
-        booking_service.create_booking(date, parking_area_id, vehicle_id, booker_id)
-        return jsonify({"message" : "Booking created successfully"}), 200
+        result, status_code = booking_service.create_booking(date, parking_area_id, vehicle_id, booker_id)
+        return jsonify(result), status_code
+    
     else:
         return "Unsupported method", 405
 
@@ -30,14 +32,16 @@ def booking(id):
         if booking:
             return jsonify(booking), 200
         return jsonify({"error": "Booking not found"}), 404
+    
     elif request.method == "PUT":
-        data = request.json
-        booking_service.update_booking(id, data)
-        return jsonify({"message" : "Booking updated successfully"}), 200
+        booking_service.update_booking(id)
+        return jsonify({"message" : "Booking paid successfully"}), 200
+    
     elif request.method == "DELETE":
         is_deleted = booking_service.delete_booking(id)
         if is_deleted:
             return jsonify({"message" : "Booking deleted successfully"}), 200
         return jsonify({"error" : "Booking could not be found or deleted"}), 404
+    
     else:
         return "Unsupported method", 405

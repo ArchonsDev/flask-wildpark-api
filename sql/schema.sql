@@ -135,55 +135,60 @@ CREATE PROCEDURE sp_CreateBooking(
 )
 BEGIN
     DECLARE isVehicleOwner INT DEFAULT 0;
+    DECLARE isVehicleBooked INT DEFAULT 0;
+
+    -- Check if vehicle belongs to the booker
     SELECT COUNT(*) INTO isVehicleOwner FROM vw_VehiclesWithOwners 
     WHERE vehicle_id = p_vehicle_id AND owner_id = p_booker_id;
 
-    IF isVehicleOwner > 0 THEN
+    -- Check if vehicle is already booked
+    SELECT COUNT(*) INTO isVehicleBooked FROM tblvehicle
+    WHERE id = p_vehicle_id AND parking_area_id IS NOT NULL;
+
+    IF isVehicleOwner > 0 AND isVehicleBooked = 0 THEN
         INSERT INTO tblbooking (date, parking_area_id, vehicle_id, booker_id, status) 
         VALUES (p_date, p_parking_area_id, p_vehicle_id, p_booker_id, 'Pending');
+
+    ELSEIF isVehicleBooked > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Vehicle is already booked.';
     ELSE 
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = "Operation failed.";
+        SET MESSAGE_TEXT = "Booker does not own this vehicle";
     END IF;
 END$$$
 DELIMITER ;
 
+-- TRIGGER WHEN BOOKING IS MADE
 DELIMITER $$$
-CREATE PROCEDURE sp_UpdateBooking(
-    IN p_booking_id INT,
-    IN p_booker_id INT,
-    IN p_date DATETIME,
-    IN p_parking_area_id INT,
-    IN p_vehicle_id INT,
-    IN p_status VARCHAR(255)
-)
+CREATE TRIGGER tr_AfterInsertBooking 
+AFTER INSERT ON tblbooking
+FOR EACH ROW
 BEGIN
-    DECLARE isVehicleOwner INT DEFAULT 0;
+    UPDATE tblparkingarea
+    SET slots = slots - 1
+    WHERE id = NEW.parking_area_id;
 
-    IF p_vehicle_id IS NOT NULL THEN
-        SELECT COUNT(*) INTO isVehicleOwner FROM vw_VehiclesWithOwners 
-        WHERE vehicle_id = p_vehicle_id AND owner_id = p_booker_id;
+    UPDATE tblvehicle
+    SET parking_area_id = NEW.parking_area_id
+    WHERE owner_id = NEW.booker_id;
+END $$$
+DELIMITER ;
 
-        IF isVehicleOwner = 0 THEN
-            SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = "Operation failed: Booker does not own the vehicle.";
-        ELSE
-            UPDATE tblbooking
-            SET
-                date = COALESCE(p_date, date),
-                parking_area_id = COALESCE(p_parking_area_id, parking_area_id),
-                vehicle_id = COALESCE(p_vehicle_id, vehicle_id),
-                status = COALESCE(p_status, status)
-            WHERE id = p_booking_id AND booker_id = p_booker_id;
-        END IF;
-    ELSE
-        -- Perform the update operation when p_vehicle_id is NULL
-        UPDATE tblbooking
-        SET
-            date = COALESCE(p_date, date),
-            parking_area_id = COALESCE(p_parking_area_id, parking_area_id),
-            status = COALESCE(p_status, status)
-        WHERE id = p_booking_id AND booker_id = p_booker_id;
+-- TRIGGER WHEN BOOKING IS PAID
+DELIMITER $$$
+CREATE TRIGGER tr_AfterUpdateBooking 
+AFTER UPDATE ON tblbooking
+FOR EACH ROW
+BEGIN
+    IF OLD.status != 'Paid' AND NEW.status = 'Paid' THEN
+        UPDATE tblparkingarea
+        SET slots = slots + 1
+        WHERE id = OLD.parking_area_id;
+
+        UPDATE tblvehicle
+        SET parking_area_id = NULL
+        WHERE owner_id = OLD.booker_id;
     END IF;
 END $$$
 DELIMITER ;
