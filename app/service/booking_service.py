@@ -9,7 +9,7 @@ class BookingService:
                 c = conn.cursor()
                 c.execute(query, (date, parking_area_id, vehicle_id, booker_id))
                 conn.commit()
-                return {"message": "Booking create successfully"}, 200
+                return {"message": "Booking created successfully"}, 200
         except Exception as e:
             return {"error": e.msg}, 400
     

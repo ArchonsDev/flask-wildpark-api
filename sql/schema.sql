@@ -171,7 +171,7 @@ BEGIN
 
     UPDATE tblvehicle
     SET parking_area_id = NEW.parking_area_id
-    WHERE owner_id = NEW.booker_id;
+    WHERE id = NEW.vehicle_id;
 END $$$
 DELIMITER ;
 
