@@ -188,10 +188,26 @@ BEGIN
 
         UPDATE tblvehicle
         SET parking_area_id = NULL
-        WHERE owner_id = OLD.booker_id;
+        WHERE id = OLD.vehicle_id;
     END IF;
 END $$$
 DELIMITER ;
+
+-- TRIGGER WHEN BOOKING IS DELETED
+DELIMITER $$$
+CREATE TRIGGER tr_AfterDeleteBooking
+AFTER DELETE ON tblbooking
+FOR EACH ROW
+BEGIN
+    UPDATE tblparkingarea
+    SET slots = slots + 1
+    WHERE id = OLD.parking_area_id;
+
+    UPDATE tblvehicle
+    SET parking_area_id = NULL
+    WHERE id = OLD.vehicle_id;
+END $$$
+DELIMITER;
 
 DELIMITER //
 CREATE PROCEDURE sp_UpdateParkingarea(
