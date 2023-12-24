@@ -5,8 +5,8 @@ POST {{host}}/accounts
 Content-Type: application/json
 
 {
-    "firstname" : "Ced",
-    "lastname" : "Drick"
+    "firstname" : "user",
+    "lastname" : "number2"
 }
 
 
@@ -34,8 +34,6 @@ Content-Type: application/json
 {
     "owner_id" : 1,
     "color": "cyan",
-    "make": "honda",
-    "model": "honda beat",
     "plate_number": "123 CED"
 }
 
