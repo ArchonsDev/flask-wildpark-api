@@ -22,22 +22,18 @@ class VehicleService:
             c.execute(query, (vehicle_id))
         
     def update_vehicle(vehicle_id, data):
-        owner_id = data.get('owner_id')
         color = data.get('color', None)
-        make = data.get('make', None)
-        model = data.get('model', None)
         plate_number = data.get('plate_number', None)
-        parking_area_id = data.get('parking_area_id', None)
         
         with mysql_pool as conn:
-            query = "CALL sp_UpdateVehicle(%s, %s, %s, %s, %s, %s, %s)"
+            query = "CALL sp_UpdateVehicle(%s, %s, %s)"
             c = conn.cursor()
-            c.execute(query, (vehicle_id, owner_id, color, make, model, plate_number, parking_area_id))
+            c.execute(query, (vehicle_id, color, plate_number))
             return True
     
     def delete_vehicle(vehicle_id):
         with mysql_pool as conn:
-            query = "DELETE FROM tblvehicle WHERE owner_id = %s"
+            query = "DELETE FROM tblvehicle WHERE id = %s"
             c = conn.cursor()
             c.execute(query, (vehicle_id,))
             return True
